@@ -1,14 +1,16 @@
 #pragma once
 #include <cstdlib>
 #include <new>
-#ifdef _MSC_VER
-// Ensure _HAS_EXCEPTIONS is defined
-#include <vcruntime.h>
-#include <malloc.h>
+
+#ifdef _WIN32
+    #include <malloc.h> // For _aligned_malloc on Windows
+    #define posix_memalign(ptr, alignment, size) *(ptr) = _aligned_malloc((size), (alignment))
+#else
+    #include <stdlib.h> // For posix_memalign on Linux/macOS
 #endif
 
-#if !((defined(_MSC_VER) && !defined(__clang__)) ? (_HAS_EXCEPTIONS) : (__EXCEPTIONS))
-#include <cstdlib>
+#if !((defined(_WIN32) && !defined(__clang__)) ? (0) : (__EXCEPTIONS))
+    #include <cstdlib>
 #endif
 
 // Aligned simple vector.
